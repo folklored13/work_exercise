@@ -1,0 +1,23 @@
+ManifestFileVersion: 0
+CRC: 1158536819
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 6d6736072fcab612b5bdae085dd4ac0a
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: c21d61fe394c58399df3c6fb5c7c99b3
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 6d6736072fcab612b5bdae085dd4ac0a
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Resources/mere.jpg
+- Assets/Resources/kar.jpg
+Dependencies: []

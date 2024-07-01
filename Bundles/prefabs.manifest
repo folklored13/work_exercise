@@ -1,0 +1,43 @@
+ManifestFileVersion: 0
+CRC: 2365719963
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 8d21ec3e5e7d17bfff091d77853d84ae
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: b288a1bf6f7fe6bd04a0123f6d12ce96
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 8d21ec3e5e7d17bfff091d77853d84ae
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 65
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/ootw.jpg
+- Assets/Cube.prefab
+- Assets/mere.jpg
+- Assets/New Material.mat
+Dependencies:
+- C:/Users/hp/AppData/LocalLow/DefaultCompany/SampleHelloWorld1/Bundles/materials
+- C:/Users/hp/AppData/LocalLow/DefaultCompany/SampleHelloWorld1/Bundles/texture2d
