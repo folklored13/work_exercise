@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<< HEAD
 guid: 4506433a24affcc43821282debb37ce8
+=======
+guid: feda2284535e5994385ea31156a8b7da
+>>>>>>> d91a4b8 (ScriptableObject的使用)
 DefaultImporter:
   externalObjects: {}
   userData: 

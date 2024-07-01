@@ -1,0 +1,37 @@
+ManifestFileVersion: 0
+CRC: 1547438081
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 9a14ac5d550a64e02bb8c76833947396
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 8a3f82d914824167d2da3fa777ef898a
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 9a14ac5d550a64e02bb8c76833947396
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 135
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Resources/Sphere.prefab
+- Assets/Resources/New Material.mat
+Dependencies: []

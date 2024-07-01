@@ -6,6 +6,15 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
+<<<<<<< HEAD
+=======
+public static class PlayerData
+{
+    public static int MoveSpeed;
+    public static int PotateSpeed;
+}
+
+>>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
 public enum AssetBundlePattern
 {
     /// <summary>
@@ -31,7 +40,12 @@ public class HelloWorld : MonoBehaviour
 {
     public AssetBundlePattern LoadPattern;
 
+<<<<<<< HEAD
     AssetBundle SampleBundle;
+=======
+    AssetBundle CubeBundle;
+    AssetBundle SphereBundle;
+>>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
     GameObject SampleObject;
 
     public Button LoadAssetBundleButton;
@@ -59,6 +73,10 @@ public class HelloWorld : MonoBehaviour
     public string DownloadPath;
     void Start()
     {
+<<<<<<< HEAD
+=======
+        
+>>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
         CheckAssetBundleLoadPath();
         LoadAssetBundleButton.onClick.AddListener(CheckAssetBundlePattern);
         LoadAssetButton.onClick.AddListener(LoadAsset);
@@ -137,10 +155,21 @@ public class HelloWorld : MonoBehaviour
 
     void CheckAssetBundlePattern()
     {
+<<<<<<< HEAD
+=======
+        
+>>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
         if (LoadPattern == AssetBundlePattern.Remote)
         {
             StartCoroutine(DownloadFile(ObjectAssetBundleName, LoadAssetBundle));
         }
+<<<<<<< HEAD
+=======
+        else
+        {
+            LoadAssetBundle();
+        }
+>>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
     }
     void LoadAssetBundle()
     {
@@ -159,7 +188,11 @@ public class HelloWorld : MonoBehaviour
         //manifest.GetAllDependencies»ñÈ¡µÄÊÇÒ»¸öAB°üËùÓĞÖ±½Ó»ò¼ä½ÓµÄÒıÓÃ
         //Îª±ÜÃâÄ³Ğ©¼ä½ÓÒıÓÃµÄ×ÊÔ´Ã»ÓĞ±»¼ÓÔØµ½£¬½¨ÒéÊ¹ÓÃGetAllDependencies
         //manifest.GetDirectDependencies»ñÈ¡µÄÊÇÖ±½ÓµÄÒıÓÃ
+<<<<<<< HEAD
         foreach (string depAssetBundleName in assetBundleManifest.GetAllDependencies(ObjectAssetBundleName))
+=======
+        foreach (string depAssetBundleName in assetBundleManifest.GetAllDependencies("1"))
+>>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
         {
             Debug.Log(depAssetBundleName);
             assetBundlePath = Path.Combine(AssetBundleLoadPath, depAssetBundleName);
@@ -167,15 +200,32 @@ public class HelloWorld : MonoBehaviour
             AssetBundle.LoadFromFile(assetBundlePath);
         }
 
+<<<<<<< HEAD
         assetBundlePath = Path.Combine(AssetBundleLoadPath, ObjectAssetBundleName);
 
         SampleBundle = AssetBundle.LoadFromFile(assetBundlePath);
+=======
+        assetBundlePath = Path.Combine(AssetBundleLoadPath, "1");
+
+        CubeBundle = AssetBundle.LoadFromFile(assetBundlePath);
+
+        assetBundlePath = Path.Combine(AssetBundleLoadPath, "2");
+
+        SphereBundle = AssetBundle.LoadFromFile(assetBundlePath);
+>>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
     }
 
     void LoadAsset()
     {
+<<<<<<< HEAD
         GameObject cubeObject = SampleBundle.LoadAsset<GameObject>("Cube");
         SampleObject = Instantiate(cubeObject);
+=======
+        GameObject cubeObject = CubeBundle.LoadAsset<GameObject>("Cube");
+        Instantiate(cubeObject);
+        cubeObject = SphereBundle.LoadAsset<GameObject>("Sphere");
+        Instantiate(cubeObject);
+>>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
     }
 
     void UnloadAssetBundle(bool isTrue)
@@ -183,7 +233,12 @@ public class HelloWorld : MonoBehaviour
         Debug.Log(isTrue);
         //µ±Ç°Ö¡Ïú»Ù¶ÔÏó
         DestroyImmediate(SampleObject);
+<<<<<<< HEAD
         SampleBundle.Unload(isTrue);
+=======
+        //CubeBundle.Unload(isTrue);
+        //SphereBundle.Unload(isTrue);
+>>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
 
         //Ê¹ÓÃunload(false)·½·¨ÓĞÒ»¸öºÜÏÔÖøµÄÓÅÊÆ£¬¾ÍÊÇ²»»áÆÆ»µµ±Ç°ÔËĞĞÊ±µÄĞ§¹û
         //Èç¹ûÓĞÊ²Ã´×ÊÔ´ÊÇAB°ü´´½¨£¬µ«ÊÇÃ»ÓĞ±»¹ÜÀí£¬µ¼ÖÂ×ÊÔ´ÈÔÈ»±»Ê¹ÓÃ¶øAB°üÊ¹ÓÃunload(true)·½·¨Ğ¶ÔØ

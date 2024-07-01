@@ -4,5 +4,9 @@ NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 2100000
   userData: 
+<<<<<<< HEAD
   assetBundleName: materials
+=======
+  assetBundleName: prefabs
+>>>>>>> d91a4b8 (ScriptableObject的使用)
   assetBundleVariant: 

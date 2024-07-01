@@ -1,7 +1,27 @@
 ManifestFileVersion: 0
+<<<<<<< HEAD
 CRC: 10931344
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
       Name: resourcesbundle
       Dependencies: {}
+=======
+CRC: 618989050
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: 82b21e38e1a1bc00ea02adaf9d2d149b
+      Dependencies: {}
+    Info_1:
+      Name: 37b37befa6a0888c135fd7fc1068a44e
+      Dependencies:
+        Dependency_0: 749914873a6fd11ca45043b92451cc28
+    Info_2:
+      Name: 749914873a6fd11ca45043b92451cc28
+      Dependencies: {}
+    Info_3:
+      Name: b1101d04374142639ebc7e51c9dd53d2
+      Dependencies:
+        Dependency_0: 749914873a6fd11ca45043b92451cc28
+>>>>>>> d91a4b8 (ScriptableObject的使用)

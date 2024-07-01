@@ -1,5 +1,15 @@
 {
   "dependencies": {
+<<<<<<< HEAD
+=======
+    "com.unity.assetbundlebrowser": {
+      "version": "https://github.com/Unity-Technologies/AssetBundles-Browser.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "ad2a81ec3068eafd48753df1825a8dd7201ce60c"
+    },
+>>>>>>> d91a4b8 (ScriptableObject的使用)
     "com.unity.burst": {
       "version": "1.8.11",
       "depth": 1,
