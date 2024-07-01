@@ -3,73 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
-<<<<<<< HEAD
-=======
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
->>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
-
-public enum AssetBundleCompressionPattern
-{
-    LZMA,
-    LZ4,
-    None
-}
+using System;
 
 /// <summary>
-<<<<<<< HEAD
-/// ËùÓĞÔÚEditorÄ¿Â¼ÏÂµÄC#½Å±¾¶¼²»»á¸ú×Å×ÊÔ´´ò°üµ½¿ÉÖ´ĞĞÎÄ¼ş°üÌåÖĞ
+/// Õâ¸öÀàÖ»ÓÃÓÚÊÖ»úÔÚEditor»·¾³ÏÂ´æÔÚµÄPackageĞÅÏ¢
+/// ¶ø·Ç´ò°üÖ®ºóµÄPackageĞÅÏ¢
 /// </summary>
-public class AssetManagerEditor 
+[Serializable]
+public class PackageEditorInfo
 {
-    //ÉùÃ÷°æ±¾ºÅ
-    public static string AssetManagerVersion = "1.0.0";
+    /// <summary>
+    /// µ±Ç°°üµÄÃû³Æ
+    /// ¿ÉÒÔÓÉ¿ª·¢ÕßÔÚ±à¼­Æ÷´°¿ÚÖĞ×ÔÓÉ¶¨Òå
+    /// </summary>
+    public string PackageName;
 
     /// <summary>
-    /// ±à¼­Æ÷Ä£ÄâÏÂ£¬²»½øĞĞ´ò°ü
-    /// ±¾µØÄ£Ê½£¬´ò°üµ½StreamingAssets
-    /// Ô¶¶ËÄ£Ê½£¬´ò°üµ½ÈÎÒâÔ¶¶ËÂ·¾¶£¬ÔÚ¸ÃÊ¾ÀıÖĞÎªpersistentDataPath
+    /// ¹éÊôÓÚµ±Ç°°üÖĞµÄ×ÊÔ´ÁĞ±í
+    /// ¿ÉÒÔÓÉ¿ª·¢ÕßÔÚ±à¼­Æ÷´°¿ÚÖĞ×ÔÓÉ¶¨Òå
     /// </summary>
-    public static AssetBundlePattern BuildingPattern;
-
-    public static AssetBundleCompressionPattern CompressionPattern;
-
-    /// <summary>
-    /// ĞèÒª´ò°üµÄÎÄ¼ş¼Ğ
-    /// </summary>
-    public static DefaultAsset AssetBundleDirectory;
-
-
-
-    public static string AssetBundleOutputPath;
-
-    /// <summary>
-    /// Í¨¹ıMenuItemÌØĞÔ£¬ÉùÃ÷Editor¶¥²¿²Ëµ¥À¸Ñ¡Ïî
-    /// </summary>
-    [MenuItem(nameof(AssetManagerEditor)+"/"+nameof(BuildAssetBundle))]
-=======
-/// ÈÎºÎBuildOption´¦ÓÚ·ÇforceRebuildÑ¡ÏîÏÂ¶¼Ä¬ÈÏÎªÔöÁ¿´ò°ü
-/// </summary>
-public enum IncrementalBuildMode
-{
-    None,
-    IncrementalBuild,
-    ForceRebuild
+    public List<UnityEngine.Object> AssetList = new List<UnityEngine.Object>();
 }
 
-public class AssetBundleVersionDifference
-{
-    /// <summary>
-    /// ĞÂÔö×ÊÔ´°ü
-    /// </summary>
-    public List<string> AdditionAssetBundles=new List<string>();
-    /// <summary>
-    /// ¼õÉÙ×ÊÔ´°ü
-    /// </summary>
-    public List<string> ReducedAssetBundles=new List<string>();
-}
 
 /// <summary>
 ///´ú±íÁËNodeÖ®¼äµÄÒıÓÃ¹ØÏµ£¬ºÜÏÔÈ»Ò»¸öNodeÖ®¼ä¿ÉÄÜÒıÓÃ¶à¸öNode£¬Ò²¿ÉÄÜ±»¶à¸öNodeËùÒıÓÃ
@@ -91,6 +50,17 @@ public class AssetBundleNode
     /// µ±Ç°NodeµÄIndexÁĞ±í£¬»áÑØ×Å×ÔÉíµÄOutEdge½øĞĞ´«µİ
     /// </summary>
     public List<int> SourceIndeices = new List<int>();
+
+    /// <summary>
+    /// Ö»ÓĞSourceAsset²Å¾ßÓĞ°üÃû
+    /// </summary>
+    public string PackageName;
+
+    /// <summary>
+    /// DerivedAssetµÄÖ»ÓĞPackageNames´ú±í±»ÒıÓÃ¹ØÏµ
+    /// </summary>
+    public List<string> PackageNames = new List<string>();
+
     /// <summary>
     /// µ±Ç°NodeËùÒıÓÃµÄNodes
     /// </summary>
@@ -110,15 +80,21 @@ public class AssetManagerEditor
     public static AssetManagerConfigScriptableObject AssetManagerConfig;
 
     
-
+    /// <summary>
+    /// ±¾´Î´ò°üËùÓĞAssetBundleµÄÊä³öÂ·¾¶
+    /// Ó¦°üº¬Ö÷°ü°üÃû£¬ÒÔÊÊÅäÔöÁ¿´ò°ü
+    /// </summary>
     public static string AssetBundleOutputPath;
 
+    /// <summary>
+    /// ´ú±íÁËÕû¸ö´ò°üÎÄ¼şÊä³öÂ·¾¶
+    /// </summary>
+    public static string BuildOutputPath;
 
     /// <summary>
     /// Í¨¹ıMenuItemÌØĞÔ£¬ÉùÃ÷Editor¶¥²¿²Ëµ¥À¸Ñ¡Ïî
     /// </summary>
     [MenuItem(nameof(AssetManagerEditor) + "/" + nameof(BuildAssetBundle))]
->>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
     static void BuildAssetBundle()
     {
         CheckBuildOutputPath();
@@ -143,13 +119,31 @@ public class AssetManagerEditor
         Debug.Log("AB°ü´ò°üÒÑÍê³É");
     }
 
-<<<<<<< HEAD
-    static BuildAssetBundleOptions CheckCompressionPattern()
+    public static void AddPackageInfoEditor()
     {
-        BuildAssetBundleOptions option = new BuildAssetBundleOptions();
-        switch (CompressionPattern)
-=======
+        AssetManagerConfig.packageEditorInfos.Add(new PackageEditorInfo());
+    }
+
+    public static void RomovePackageInfoEditor(PackageEditorInfo info)
+    {
+        if(AssetManagerConfig.packageEditorInfos.Contains(info))
+        {
+            AssetManagerConfig.packageEditorInfos.Remove(info);
+        }
+    }
+    public static void AddAsset(PackageEditorInfo info)
+    {
+        info.AssetList.Add(null);
+    }
     
+    public static void RemoveAsset(PackageEditorInfo info,UnityEngine.Object asset)
+    {
+        if(info.AssetList.Contains(asset))
+        {
+            info.AssetList.Remove(asset);
+        }
+    }
+
     [MenuItem(nameof(AssetManagerEditor) + "/" + nameof(CreateConfig))]
     static void CreateConfig()
     {
@@ -170,12 +164,11 @@ public class AssetManagerEditor
             AssetManagerConfig = AssetDatabase.LoadAssetAtPath<AssetManagerConfigScriptableObject>("Assets/Editor/AssetManagerConfig.asset");
             window.VersionString = AssetManagerConfig.AssetManagerVersion.ToString();
 
-            for(int i=window.VersionString.Length;i>=1;i--)
+            for(int i=window.VersionString.Length-1;i>=1;i--)
             {
                 window.VersionString = window.VersionString.Insert(i, ".");
             }
 
-            window.editorWindowDirectory = AssetManagerConfig.AssetBundleDirectory;
         }
     }
 
@@ -263,7 +256,7 @@ public class AssetManagerEditor
         return stringBuilder.ToString();
     }
 
-    static string[] BuildAssetBundleHashTable(AssetBundleBuild[] assetBundleBuilds)
+    static string[] BuildAssetBundleHashTable(AssetBundleBuild[] assetBundleBuilds,string versionPath)
     {
         //±íµÄ³¤¶ÈºÍAssetBundleµÄÊıÁ¿±£³ÖÒ»ÖÂ
         string[] assetBundleHashs = new string[assetBundleBuilds.Length];
@@ -271,62 +264,117 @@ public class AssetManagerEditor
         for(int i =0;i<assetBundleBuilds.Length;i++)
         {
             string assetBundlePath = Path.Combine(AssetBundleOutputPath, assetBundleBuilds[i].assetBundleName);
+
             FileInfo info = new FileInfo(assetBundlePath);
+
             //±íÖĞ¼ÇÂ¼µÄÊÇÒ»¸öAssetBundleÎÄ¼şµÄ³¤¶È£¬ÒÔ¼°ÆäÄÚÈİµÄMD5¹şÏ£Öµ
             assetBundleHashs[i] = $"{info.Length}_{assetBundleBuilds[i].assetBundleName}";
         }
 
         string hashString = JsonConvert.SerializeObject(assetBundleHashs);
         string hashFilePath = Path.Combine(AssetBundleOutputPath, "AssetBundleHashs");
+        string hashFileVersionPath = Path.Combine(versionPath, "AssetBundleHashs");
 
         File.WriteAllText(hashFilePath, hashString);
+        File.WriteAllText(hashFileVersionPath, hashString);
 
         return assetBundleHashs;
     }
 
-    static AssetBundleVersionDifference ContrastAssetBundleVersion(string[] oldVersionAssets,string[] newVersionAssets)
-    {
-        AssetBundleVersionDifference difference = new AssetBundleVersionDifference();
-        foreach(var assetName in oldVersionAssets)
-        {
-            if(newVersionAssets.Contains(assetName))
-            {
-                difference.ReducedAssetBundles.Add(assetName);
-            }
-        }
-
-        foreach(var assetName in newVersionAssets)
-        {
-            if(!oldVersionAssets.Contains(assetName))
-            {
-                difference.AdditionAssetBundles.Add(assetName);
-            }
-        }
-
-        return difference;
-    }
-
+    
     public static void BuildAssetBundleFromDirectedGraph()
     {
         CheckBuildOutputPath();
-        List<string> selectedAssets = GetAllSelectedAssets();
+
         List<AssetBundleNode> allNodes = new List<AssetBundleNode>();
-        //µ±Ç°ËùÑ¡ÖĞµÄ×ÊÔ´¾ÍÊÇSourceAsset£¬ËùÒÔÊ×ÏÈµ÷¼ÓSourceAssetµÄNode
-        for (int i = 0; i < selectedAssets.Count; i++)
+
+        int sourceIndex = 0;
+
+        Dictionary<string, PackageBuildInfo> packageInfoDic = new Dictionary<string, PackageBuildInfo>();
+        #region ÓĞÏòÍ¼¹¹½¨
+        for (int i=0;i<AssetManagerConfig.packageEditorInfos.Count; i++)
         {
-            AssetBundleNode currenNode = new AssetBundleNode();
-            currenNode.AssetName = selectedAssets[i];
-            currenNode.SourceIndex = i;
-            currenNode.SourceIndeices = new List<int>() { i };
-            currenNode.InEdge = new AssetBundleEdge();
-            allNodes.Add(currenNode);
+            PackageBuildInfo packageBuildInfo = new PackageBuildInfo();
+            packageBuildInfo.PackageName = AssetManagerConfig.packageEditorInfos[i].PackageName;
 
-            GetNodeFromDependencies(currenNode, allNodes);
+            packageBuildInfo.IsSourcePackage = true;
+
+            packageInfoDic.Add(packageBuildInfo.PackageName, packageBuildInfo);
+
+            //µ±Ç°ËùÑ¡ÖĞµÄ×ÊÔ´¾ÍÊÇSourceAsset£¬ËùÒÔÊ×ÏÈµ÷¼ÓSourceAssetµÄNode
+            foreach (UnityEngine.Object asset in AssetManagerConfig.packageEditorInfos[i].AssetList)
+            {
+                AssetBundleNode currenNode = null;
+                //ÒÔ×ÊÔ´µÄ¾ßÌåÂ·¾¶£¬×÷Îª×ÊÔ´Ãû³Æ
+                string assetNamePath= AssetDatabase.GetAssetPath(asset);
+
+                foreach(AssetBundleNode node in allNodes)
+                {
+                    if(node.AssetName==assetNamePath)
+                    {
+                        currenNode = node;
+                        currenNode.PackageName = packageBuildInfo.PackageName;
+                        break;
+                    }
+                }
+
+                if(currenNode==null)
+                {
+                    currenNode = new AssetBundleNode();
+                    currenNode.AssetName = assetNamePath;
+
+                    currenNode.SourceIndex = sourceIndex;
+                    currenNode.SourceIndeices = new List<int>() { sourceIndex };
+
+                    currenNode.PackageName = packageBuildInfo.PackageName;
+                    currenNode.PackageNames.Add(currenNode.PackageName);
+
+                    currenNode.InEdge = new AssetBundleEdge();
+                    allNodes.Add(currenNode);
+                }
+
+                GetNodeFromDependencies(currenNode, allNodes);
+
+                sourceIndex++;
+            }
         }
+        #endregion
 
+        #region ÓĞÏòÍ¼Çø·Ö´ò°ü¼¯ºÏ
         Dictionary<List<int>, List<AssetBundleNode>> assetBundleNodeDic = new Dictionary<List<int>, List<AssetBundleNode>>();
+
         foreach (AssetBundleNode node in allNodes)
         {
+            StringBuilder packageNameString = new StringBuilder();
+
+            //°üÃû²»Îª¿Õ»òÎŞ£¬Ôò´ú±íÊÇÒ»¸öSourceAsset£¬Æä°üÃûÒÑ¾­ÔÚ±à¼­Æ÷´°¿ÚÖĞÌí¼ÓÁË
+            if(string.IsNullOrEmpty(node.PackageName))
+            {
+                for(int i =0; i<node.PackageNames.Count;i++)
+                {
+                    packageNameString.Append(node.PackageNames[i]);
+                    if(i<node.PackageNames.Count-1)
+                    {
+                        packageNameString.Append("_");
+                    }
+                }
+
+                string packageName = packageNameString.ToString();
+                node.PackageName = packageName;
+
+                //´ËÊ±Ö»Ìí¼ÓÁË¶ÔÓ¦µÄ°üºÍ°üÃû
+                //¶øÃ»ÓĞ¾ßÌåÌí¼Ó°üÖĞ¶ÔÓ¦µÄAsset
+                //ÒòÎªAssetÌí¼ÓÊ±ĞèÒª¾ßÓĞAssetBundleName,
+                //ËùÒÔÖ»ÄÜÔÚÉú³ÉAssetBundleBuildµÄµØ·½Ìí¼ÓAsset
+                if(!packageInfoDic.ContainsKey(packageName))
+                {
+                    PackageBuildInfo packageBuildInfo = new PackageBuildInfo();
+                    packageBuildInfo.PackageName = packageName;
+                    packageBuildInfo.IsSourcePackage = false;
+                    packageInfoDic.Add(packageBuildInfo.PackageName, packageBuildInfo);
+                }
+            }
+
             bool isEquals = false;
             List<int> keyList = new List<int>();
             foreach (List<int> key in assetBundleNodeDic.Keys)
@@ -346,6 +394,8 @@ public class AssetManagerEditor
             }
             assetBundleNodeDic[keyList].Add(node);
         }
+        #endregion
+
         AssetBundleBuild[] assetBundleBuilds = new AssetBundleBuild[assetBundleNodeDic.Count];
         int buildIndex = 0;
 
@@ -358,70 +408,113 @@ public class AssetManagerEditor
             foreach (AssetBundleNode node in assetBundleNodeDic[key])
             {
                 assetNames.Add(node.AssetName);
+
+                //Èç¹ûÊÇÒ»¸öSourceAsset£¬ÔòËûµÄPackageNameÖ»»á¾ßÓĞËû×Ô¼º
+                foreach (string packageName in node.PackageNames)
+                {
+                    if(packageInfoDic.ContainsKey(packageName))
+                    {
+                        if(!packageInfoDic[packageName].PackageDependencies.Contains(node.PackageName) && !string.Equals(node.PackageName, packageInfoDic
+                            [packageName].PackageName))
+                        {
+                            packageInfoDic[packageName].PackageDependencies.Add(node.PackageName);
+                        }
+                    }
+                }
             }
             string[] assetNamesArray = assetNames.ToArray();
             assetBundleBuilds[buildIndex].assetBundleName = ComputeAssetSetSignature(assetNamesArray);
             assetBundleBuilds[buildIndex].assetNames = assetNamesArray;
+            
+            foreach (AssetBundleNode node in assetBundleNodeDic[key])
+            {
+                //ÒòÎªÇø·ÖÁËµÄDerivedPackage
+                //ËùÒÔ´Ë´¦¿ÉÒÔÈ·±££¬Ã¿Ò»¸öNode¶¼¾ßÓĞÒ»¸ö°üÃû
+                AssetBuildInfo assetBuildInfo = new AssetBuildInfo();
+
+                assetBuildInfo.AssetName = node.AssetName;
+                assetBuildInfo.AssetBundleName = assetBundleBuilds[buildIndex].assetBundleName;
+
+                packageInfoDic[node.PackageName].AssetInfos.Add(assetBuildInfo);
+                
+            }
             buildIndex++;
         }
+
+
         BuildPipeline.BuildAssetBundles(AssetBundleOutputPath, assetBundleBuilds, CheckIncrementalBuildMode(),
             BuildTarget.StandaloneWindows);
 
-        string[] currentVersionAssetHashs= BuildAssetBundleHashTable(assetBundleBuilds);
+        string buildVersionFilePath = Path.Combine(BuildOutputPath, "BuildVersion.version");
+        File.WriteAllText(buildVersionFilePath, AssetManagerConfig.CurrentBuildVersion.ToString());
 
-        CopyAssetBundleToVersionFolder();
-        GetVersionDifference(currentVersionAssetHashs);
+        //´´½¨°æ±¾Â·¾¶
+        string versionPath = Path.Combine(BuildOutputPath, AssetManagerConfig.CurrentBuildVersion.ToString());
+
+        if (!Directory.Exists(versionPath))
+        {
+            //ÈôÂ·¾¶²»´æÔÚ¾Í´´½¨Â·¾¶
+            Directory.CreateDirectory(versionPath);
+        }
+
+        BuildAssetBundleHashTable(assetBundleBuilds,versionPath);
+
+        CopyAssetBundleToVersionFolder(versionPath);
+
+        BuildPackageTable(packageInfoDic, versionPath);
+
         AssetManagerConfig.CurrentBuildVersion++;
         //Ë¢ĞÂProject½çÃæ£¬Èç¹û²»ÊÇ´ò°üµ½¹¤³ÌÄÚÔò²»ĞèÒªÖ´ĞĞ
         AssetDatabase.Refresh();
 
-        /*
-        foreach(AssetBundleNode node in allNodes)
+    }
+
+    public static string PackageTableName = "AllPackages";
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="packages">Package×Öµä£¬keyÎª°üÃû</param>
+    /// <param name="outputPath"></param>
+    static void BuildPackageTable(Dictionary<string,PackageBuildInfo> packages,string versionPath)
+    {
+        
+        string packagesPath = Path.Combine(AssetBundleOutputPath, PackageTableName);
+        string packageVersionPath = Path.Combine(versionPath, PackageTableName);
+
+        string packagesJSON = JsonConvert.SerializeObject(packages.Keys);
+
+        File.WriteAllText(packagesPath, packagesJSON);
+        File.WriteAllText(packageVersionPath, packagesJSON);
+
+        foreach (PackageBuildInfo package in packages.Values)
         {
-            if(node.SourceIndex>=0)
-            {
-                Debug.Log($"{ node.AssetName}ÊÇÒ»¸öSourceAsset");
-            }
-            else
-            {
-                Debug.Log($"{ node.AssetName}ÊÇÒ»¸öDrivedAsset,±»{node.SourceIndeices.Count}¸ö×ÊÔ´ËùÒıÓÃ");
-            }
-        }*/
+            packagesPath = Path.Combine(AssetBundleOutputPath, package.PackageName);
+            packagesJSON = JsonConvert.SerializeObject(package);
+            packageVersionPath = Path.Combine(versionPath, package.PackageName);
+
+            File.WriteAllText(packagesPath, packagesJSON);
+            File.WriteAllText(packageVersionPath, packagesJSON);
+        }
 
     }
 
-    static void CopyAssetBundleToVersionFolder()
+    static void CopyAssetBundleToVersionFolder(string versionPath)
     {
-        string versionString = AssetManagerConfig.CurrentBuildVersion.ToString();
-        for (int i = versionString.Length - 1; i >= 1; i--)
-        {
-            versionString = versionString.Insert(i, ".");
-        }
-
-        string assetBundleVersionPath = Path.Combine(Application.streamingAssetsPath, versionString, HelloWorld.MainAssetBundleName);
-        if(!Directory.Exists(assetBundleVersionPath))
-        {
-            Directory.CreateDirectory(assetBundleVersionPath);
-        }
-
+        //´ÓAssetBundleÊä³öÂ·¾¶ÏÂ¶ÁÈ¡°üÁĞ±í
         string[] assetNames = ReadAssetBundleHashTable(AssetBundleOutputPath);
 
-        //¸´ÖÆ¹şÏ£±í
-        string hashTableOriginPath = Path.Combine(AssetBundleOutputPath, "AssetBundleHashs");
-        string hashTableVersionPath = Path.Combine(assetBundleVersionPath, "AssetBundleHashs");
-        File.Copy(hashTableOriginPath, hashTableVersionPath);
         //¸´ÖÆÖ÷°ü
-        string mainBundleOriginPath = Path.Combine(AssetBundleOutputPath, HelloWorld.MainAssetBundleName);
-        string mainBundleVersionPath = Path.Combine(assetBundleVersionPath, HelloWorld.MainAssetBundleName);
-        File.Copy(mainBundleOriginPath, mainBundleVersionPath);
+        string mainBundleOriginPath = Path.Combine(AssetBundleOutputPath, OutputBundleName);
+        string mainBundleVersionPath = Path.Combine(versionPath, OutputBundleName);
+        File.Copy(mainBundleOriginPath, mainBundleVersionPath,true);
 
-        foreach(var assetName in assetNames)
+        foreach (var assetName in assetNames)
         {
             string assetHashName = assetName.Substring(assetName.IndexOf("_") + 1);
 
             string assetOriginPath = Path.Combine(AssetBundleOutputPath, assetHashName);
             //fileInfo.NameÊÇ°üº¬ÁËÀ©Õ¹ÃûµÄÎÄ¼şÃû
-            string assetVersionPath = Path.Combine(assetBundleVersionPath, assetHashName);
+            string assetVersionPath = Path.Combine(versionPath, assetHashName);
             //fileInfo.FullNameÊÇ°üº¬ÁËÄ¿Â¼ºÍÎÄ¼şÃûµÄÎÄ¼şÍêÕûÂ·¾¶
             File.Copy(assetOriginPath, assetVersionPath,true);
         }
@@ -455,33 +548,6 @@ public class AssetManagerEditor
         return VersionAssetHashs;
     }
 
-    static void GetVersionDifference(string[] currentAssetHashs)
-    {
-        if (AssetManagerConfig.CurrentBuildVersion >= 101)
-        {
-            int lastVersion = AssetManagerConfig.CurrentBuildVersion - 1;
-            string versionString = AssetManagerConfig.CurrentBuildVersion.ToString();
-            for (int i = versionString.Length - 1; i >= 1; i--)
-            {
-                versionString = versionString.Insert(i, ".");
-            }
-            var lastOutputPath = Path.Combine(Application.streamingAssetsPath, versionString, HelloWorld.MainAssetBundleName);
-
-            string[] lastVersionAssetHashs = ReadAssetBundleHashTable(lastOutputPath);
-
-            AssetBundleVersionDifference difference = ContrastAssetBundleVersion(lastVersionAssetHashs, currentAssetHashs);
-            
-            foreach (var assetName in difference.AdditionAssetBundles)
-            {
-                Debug.Log($"µ±Ç°°æ±¾ĞÂÔö×ÊÔ´{assetName}");
-            }
-            foreach (var assetName in difference.AdditionAssetBundles)
-            {
-                Debug.Log($"µ±Ç°°æ±¾¼õÉÙ×ÊÔ´{assetName}");
-            }
-            Debug.Log("1111");
-        }
-    }
 
     /// <summary>
     /// 
@@ -529,51 +595,57 @@ public class AssetManagerEditor
             currentNode.InEdge.nodes.Add(lastNode);
             lastNode.OutEdge.nodes.Add(currentNode);
 
+            //°üÃûÒÔ¼°°ü¶Ô×ÊÔ´µÄÒıÓÃ£¬Í¬ÑùÒ²Í¨¹ıÓĞÏòÍ¼½øĞĞ´«µİ
+            if (!string.IsNullOrEmpty(lastNode.PackageName))
+            {
+                if (!currentNode.PackageNames.Contains(lastNode.PackageName))
+                {
+                    currentNode.PackageNames.Add(lastNode.PackageName);
+                }
+
+            }
+            //·ñÔòÊÇDerivedAsset,Ö±½Ó»ñÈ¡last NodeµÄSourceIndices¼´¿É
+            else
+            {
+                foreach (string packageNames in lastNode.PackageNames)
+                {
+                    if (!currentNode.PackageNames.Contains(packageNames))
+                    {
+                        currentNode.PackageNames.Add(packageNames);
+                    }
+                }
+            }
+
             //Èç¹ûlastNodeÊÇSourceAsset,ÔòÖ±½ÓÎªµ±Ç°NodeÌí¼Ólast NodeµÄIndex
             //ÒòÎªListÊÇÒ»¸öÒıÓÃÀàĞÍ£¬ËùÒÔSourceAssetµÄSourceindeiesÄÄÅÂÄÚÈİºÍderivedÒ»Ñù£¬Ò²ÊÓÎªÒ»¸öĞÂµÄList
             if (lastNode.SourceIndex >= 0)
             {
-
-                currentNode.SourceIndeices.Add(lastNode.SourceIndex);
+                if(!currentNode.SourceIndeices.Contains(lastNode.SourceIndex))
+                {
+                    currentNode.SourceIndeices.Add(lastNode.SourceIndex);
+                }
+                
             }
             //·ñÔòÊÇDerivedAsset,Ö±½Ó»ñÈ¡last NodeµÄSourceIndices¼´¿É
             else
             {
                 foreach (int index in lastNode.SourceIndeices)
                 {
-                    if (currentNode.SourceIndeices.Contains(index))
+                    if (!currentNode.SourceIndeices.Contains(index))
                     {
                         currentNode.SourceIndeices.Add(index);
                     }
                 }
-                currentNode.SourceIndeices = lastNode.SourceIndeices;
             }
-
+            GetNodeFromDependencies(currentNode, allNodes);
         }
     }
-    public static List<string> GetAllSelectedAssets()
-    {
-        List<string> selectedAssets = new List<string>();
 
-        if (AssetManagerConfig.CurrentSelectedAssets == null || AssetManagerConfig.CurrentSelectedAssets.Length == 0)
-        {
-            return null;
-        }
-        //½«ÖµÎªtrueµÄ¶ÔÓ¦Ë÷ÒıÎÄ¼ş£¬Ìí¼Óµ½Òª´ò°üµÄ×ÊÔ´ÁĞ±íÖĞ
-        for (int i = 0; i < AssetManagerConfig.CurrentSelectedAssets.Length; i++)
-        {
-            if (AssetManagerConfig.CurrentSelectedAssets[i])
-            {
-                selectedAssets.Add(AssetManagerConfig.CurrentAllAssets[i]);
-            }
-        }
-        return selectedAssets;
-    }
 
     public static List<string> GetSeletedAssetsDependencies()
     {
         List<string> depensencies = new List<string>();
-        List<string> selecedAssets = GetAllSelectedAssets();
+        List<string> selecedAssets = new List<string>();
         for (int i = 0; i < selecedAssets.Count; i++)
         {
             //ËùÓĞÍ¨¹ı¸Ã·½·¨»ñÈ¡µ½µÄÊı×é£¬¿ÉÒÔÊÓÎª¼¯ºÏLÖĞµÄÒ»¸öÔªËØ
@@ -592,7 +664,6 @@ public class AssetManagerEditor
     {
         BuildAssetBundleOptions option = new BuildAssetBundleOptions();
         switch (AssetManagerConfig.CompressionPattern)
->>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
         {
             case AssetBundleCompressionPattern.LZMA:
                 option = BuildAssetBundleOptions.None;
@@ -622,74 +693,35 @@ public class AssetManagerEditor
 
     }
 
+    public static string OutputBundleName = "LocalAssets";
     static void CheckBuildOutputPath()
     {
-<<<<<<< HEAD
-        switch(BuildingPattern)
-=======
         
         switch (AssetManagerConfig.BuildingPattern)
->>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
         {
             case AssetBundlePattern.EditorSimulation:
                 break;
             case AssetBundlePattern.Local:
-<<<<<<< HEAD
-                 AssetBundleOutputPath = Path.Combine(Application.streamingAssetsPath, HelloWorld.MainAssetBundleName);
+                BuildOutputPath = Path.Combine(Application.streamingAssetsPath, "BuildOutput");
                 break;
             case AssetBundlePattern.Remote:
-                AssetBundleOutputPath = Path.Combine(Application.persistentDataPath, HelloWorld.MainAssetBundleName);
+                BuildOutputPath = Path.Combine(Application.persistentDataPath, "BuildOutput");
                 break;
         }
-    }
-
-    /// <summary>
-    /// ´ò°üÖ¸¶¨ÎÄ¼ş¼ĞÏÂËùÓĞ×ÊÔ´ÎªAssetBundle
-    /// </summary>
-    public static void BuildAssetBundleFromDirectory()
-    {
-        CheckBuildOutputPath();
-        if (AssetBundleDirectory == null)
+        
+        if (!Directory.Exists(BuildOutputPath))
         {
-            Debug.LogError("´ò°üÄ¿Â¼²»´æÔÚ");
-            return;
+            //ÈôÂ·¾¶²»´æÔÚ¾Í´´½¨Â·¾¶
+            Directory.CreateDirectory(BuildOutputPath);
         }
-        //»ñÈ¡ÎÄ¼şÂ·¾¶
-        string directoryPath = AssetDatabase.GetAssetPath(AssetBundleDirectory);
-        //½«ÁĞ±í×ª»¯ÎªÊı×é
-        string[] assetPaths = FindAllAssetFromDirectory(directoryPath).ToArray();
 
-        AssetBundleBuild[] assetBundleBuild = new AssetBundleBuild[1];
+        AssetBundleOutputPath = Path.Combine(BuildOutputPath, OutputBundleName);
 
-        //½«Òª´ò°üµÄ¾ßÌå°üÃû£¬¶ø²»ÊÇÖ÷°üÃû
-        assetBundleBuild[0].assetBundleName = HelloWorld.ObjectAssetBundleName;
-
-        //ÕâÀïËäÈ»ÃûÎªName£¬Êµ¼ÊÉÏĞèÒª×ÊÔ´ÔÚ¹¤³ÌÏÂµÄÂ·¾¶
-        assetBundleBuild[0].assetNames = assetPaths;
-
-=======
-                AssetBundleOutputPath = Path.Combine(Application.streamingAssetsPath,"Local", HelloWorld.MainAssetBundleName);
-                break;
-            case AssetBundlePattern.Remote:
-                AssetBundleOutputPath = Path.Combine(Application.persistentDataPath, "Remote",HelloWorld.MainAssetBundleName);
-                break;
-        }
->>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
-        if (string.IsNullOrEmpty(AssetBundleOutputPath))
-        {
-            Debug.LogError("Êä³öÂ·¾¶Îª¿Õ");
-            return;
-        }
-        else if (!Directory.Exists(AssetBundleOutputPath))
+        if (!Directory.Exists(AssetBundleOutputPath))
         {
             //ÈôÂ·¾¶²»´æÔÚ¾Í´´½¨Â·¾¶
             Directory.CreateDirectory(AssetBundleOutputPath);
         }
-<<<<<<< HEAD
-        //UnityÖĞInspectorÃæ°åÅäÖÃµÄAssetBundleĞÅÏ¢£¬ÆäÊµ¾ÍÊÇÒ»¸öAssetBundle½á¹¹Ìå
-        //UnityÖ»²»¹ıÊÇ±éÀúÁËËùÓĞµÄÎÄ¼ş¼Ğ£¬²¢°ÑÎÒÃÇÔÚÎÄ¼ş¼ĞÖĞÅäÖÃµÄAssetBundleÊÕ¼¯ÆğÀ´²¢´ò°ü
-        BuildPipeline.BuildAssetBundles(AssetBundleOutputPath, assetBundleBuild, CheckCompressionPattern(),
-=======
     }
 
     /// <summary>
@@ -729,13 +761,9 @@ public class AssetManagerEditor
     public static void BuiAssetBundleFromSets()
     {
         CheckBuildOutputPath();
-        if (AssetManagerConfig.AssetBundleDirectory == null)
-        {
-            Debug.LogError("´ò°üÄ¿Â¼²»´æÔÚ");
-            return;
-        }
+        
         //±»Ñ¡ÖĞ½«Òª´ò°üµÄ×ÊÔ´ÁĞ±í,¼´ÁĞ±íA
-        List<string> selectedAssets = GetAllSelectedAssets();
+        List<string> selectedAssets = new List<string>();
 
         //¼¯ºÏÁĞ±íL
         List<List<GUID>> selectedAssetsDependencies = new List<List<GUID>>();
@@ -804,33 +832,28 @@ public class AssetManagerEditor
     public static void BuildAssetBundleFromEditorWindow()
     {
         CheckBuildOutputPath();
-        if (AssetManagerConfig.AssetBundleDirectory == null)
-        {
-            Debug.LogError("´ò°üÄ¿Â¼²»´æÔÚ");
-            return;
-        }
-
+        
         //±»Ñ¡ÖĞ½«Òª´ò°üµÄ×ÊÔ´ÁĞ±í
-        List<string> selectedAssets = GetAllSelectedAssets();
+        List<string> selectedAssets = new List<string>();
 
         //Ñ¡ÖĞ¶àÉÙ¸ö×ÊÔ´Ôò´ò°ü¶àÉÙ¸öAB°ü
         AssetBundleBuild[] assetBundleBuilds = new AssetBundleBuild[selectedAssets.Count];
 
-        string directoryPath = AssetDatabase.GetAssetPath(AssetManagerConfig.AssetBundleDirectory);
+        //string directoryPath = AssetDatabase.GetAssetPath(AssetManagerConfig.AssetBundleDirectory);
 
         for (int i = 0; i < assetBundleBuilds.Length; i++)
         {
-            string bundleName = selectedAssets[i].Replace($@"{directoryPath}\", string.Empty);
-            //Unity×÷µ¼Èë.prefabÎÄ×÷Ê±£¬»áÄ¬ÈÏÊ¹ÓÃÔ¤ÖÆÌåµ¼ÈëÆ÷µ¼Èë£¬¶øassetBundle²»ÊÇÔ¤ÖÆÌå£¬ËùÒÔ»áµ¼ÖÂ±¨´í
-            bundleName = bundleName.Replace(".prefab", string.Empty);
+            //string bundleName = selectedAssets[i].Replace($@"{directoryPath}\", string.Empty);
 
-            assetBundleBuilds[i].assetBundleName = bundleName;
+            //Unity×÷µ¼Èë.prefabÎÄ×÷Ê±£¬»áÄ¬ÈÏÊ¹ÓÃÔ¤ÖÆÌåµ¼ÈëÆ÷µ¼Èë£¬¶øassetBundle²»ÊÇÔ¤ÖÆÌå£¬ËùÒÔ»áµ¼ÖÂ±¨´í
+            //bundleName = bundleName.Replace(".prefab", string.Empty);
+
+            //assetBundleBuilds[i].assetBundleName = bundleName;
 
             assetBundleBuilds[i].assetNames = new string[] { selectedAssets[i] };
         }
 
         BuildPipeline.BuildAssetBundles(AssetBundleOutputPath, assetBundleBuilds, CheckCompressionPattern(),
->>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
             BuildTarget.StandaloneWindows);
 
         //´òÓ¡Êä³öÂ·¾¶
@@ -840,33 +863,22 @@ public class AssetManagerEditor
         AssetDatabase.Refresh();
     }
 
-<<<<<<< HEAD
-    public static List<string> FindAllAssetFromDirectory(string directoryPath)
-    {
-        List<string> assetPaths = new List<string>();
-        //Èç¹û´«ÈëµÄÂ·¾¶Îª¿Õ»òÕß²»´æÔÚµÄ»°
-        if(string.IsNullOrEmpty(directoryPath) || !Directory.Exists(directoryPath))
-=======
     /// <summary>
     /// ´ò°üÖ¸¶¨ÎÄ¼ş¼ĞÏÂËùÓĞ×ÊÔ´ÎªAssetBundle
     /// </summary>
     public static void BuildAssetBundleFromDirectory()
     {
         CheckBuildOutputPath();
-        if (AssetManagerConfig.AssetBundleDirectory == null)
-        {
-            Debug.LogError("´ò°üÄ¿Â¼²»´æÔÚ");
-            return;
-        }
+        
 
 
         AssetBundleBuild[] assetBundleBuild = new AssetBundleBuild[1];
 
         //½«Òª´ò°üµÄ¾ßÌå°üÃû£¬¶ø²»ÊÇÖ÷°üÃû
-        assetBundleBuild[0].assetBundleName = HelloWorld.ObjectAssetBundleName;
+        assetBundleBuild[0].assetBundleName = "Local";
 
         //ÕâÀïËäÈ»ÃûÎªName£¬Êµ¼ÊÉÏĞèÒª×ÊÔ´ÔÚ¹¤³ÌÏÂµÄÂ·¾¶
-        assetBundleBuild[0].assetNames = AssetManagerConfig.CurrentAllAssets.ToArray();
+        //assetBundleBuild[0].assetNames = AssetManagerConfig.CurrentAllAssets.ToArray();
 
     }
 
@@ -894,7 +906,6 @@ public class AssetManagerEditor
         List<string> assetPaths = new List<string>();
         //Èç¹û´«ÈëµÄÂ·¾¶Îª¿Õ»òÕß²»´æÔÚµÄ»°
         if (string.IsNullOrEmpty(directoryPath) || !Directory.Exists(directoryPath))
->>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
         {
             Debug.Log("ÎÄ¼ş¼ĞÂ·¾¶²»´æÔÚ");
             return null;
@@ -908,17 +919,10 @@ public class AssetManagerEditor
         FileInfo[] fileInfos = directoryInfo.GetFiles();
 
         //ËùÓĞ·ÇÔªÊı¾İÎÄ¼ş(ºó×º²»ÊÇmetaµÄÎÄ¼ş)Â·¾¶¶¼Ìí¼Óµ½ÁĞ±íÖĞÓÃÓÚ´ò°üÕâĞ©ÎÄ¼ş
-<<<<<<< HEAD
-        foreach(FileInfo info in fileInfos)
-        {
-            //.metaÎÄ¼ş´ú±íÃèÊöÎÄ¼ş
-            if(info.Extension.Contains(".meta"))
-=======
         foreach (FileInfo info in fileInfos)
         {
             //.metaÎÄ¼ş´ú±íÃèÊöÎÄ¼ş
             if (!isValidExtensionName(info.Extension))
->>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
             {
                 continue;
             }
@@ -929,8 +933,5 @@ public class AssetManagerEditor
         }
         return assetPaths;
     }
-<<<<<<< HEAD
-=======
 
->>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
 }

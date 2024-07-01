@@ -1,0 +1,23 @@
+ManifestFileVersion: 0
+CRC: 394471746
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: 82b21e38e1a1bc00ea02adaf9d2d149b
+      Dependencies:
+        Dependency_0: 67e688fcdb8e953325a3e8f012eacf95
+    Info_1:
+      Name: 37b37befa6a0888c135fd7fc1068a44e
+      Dependencies:
+        Dependency_0: a0da1096d5b8d35e36fd2d3d963d3e09
+    Info_2:
+      Name: 67e688fcdb8e953325a3e8f012eacf95
+      Dependencies: {}
+    Info_3:
+      Name: a0da1096d5b8d35e36fd2d3d963d3e09
+      Dependencies:
+        Dependency_0: 67e688fcdb8e953325a3e8f012eacf95
+    Info_4:
+      Name: b1101d04374142639ebc7e51c9dd53d2
+      Dependencies:
+        Dependency_0: a0da1096d5b8d35e36fd2d3d963d3e09

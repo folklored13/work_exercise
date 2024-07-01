@@ -1,36 +1,19 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-<<<<<<< HEAD
-=======
 public static class PlayerData
 {
     public static int MoveSpeed;
     public static int PotateSpeed;
 }
 
->>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
-public enum AssetBundlePattern
-{
-    /// <summary>
-    /// ±à¼­Æ÷Ä£Äâ¼ÓÔØ£¬Ó¦¸ÃÊ¹ÓÃAssetDataBase½øĞĞ×ÊÔ´¼ÓÔØ£¬¶ø²»ÓÃ½øĞĞ´ò°ü
-    /// </summary>
-    EditorSimulation,
-    /// <summary>
-    /// ±¾µØ¼ÓÔØÄ£Ê½£¬Ó¦´ò°üµ½±¾µØÂ·¾¶»òStreamingAssetsÂ·¾¶ÏÂ£¬´Ó¸ÃÂ·¾¶¼ÓÔØ
-    /// </summary>
-    Local,
-    /// <summary>
-    /// Ô¶¶Ë¼ÓÔØÄ£Ê½£¬Ó¦´ò°üµ½ÈÎÒâ×ÊÔ´·şÎñÆ÷µØÖ·£¬È»ºóÍ¨¹ıÍøÂç½øĞĞÏÂÔØ
-    /// ÏÂÔØµ½É³ºĞÂ·¾¶persistentDataPathºó£¬ÔÙ½øĞĞ¼ÓÔØ
-    /// </summary>
-    Remote
-}
 
 /// <summary>
 /// ÒòÎªAssetsÏÂµÄÆäËû½Å±¾»á±»±àÒëµ½AssemblyCsharp.dllÖĞ
@@ -40,12 +23,8 @@ public class HelloWorld : MonoBehaviour
 {
     public AssetBundlePattern LoadPattern;
 
-<<<<<<< HEAD
-    AssetBundle SampleBundle;
-=======
     AssetBundle CubeBundle;
     AssetBundle SphereBundle;
->>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
     GameObject SampleObject;
 
     public Button LoadAssetBundleButton;
@@ -57,31 +36,335 @@ public class HelloWorld : MonoBehaviour
     /// ´ò°üµÄ°üÃû±¾Ó¦¸ÃÓÉEditorÀà¹ÜÀí£¬µ«ÒòÎª×ÊÔ´¼ÓÔØÒ²ĞèÒª·ÃÎÊ
     /// ËùÒÔ·ÅÔÚ×ÊÔ´¼ÓÔØÀàÖĞ
     /// </summary>
-    public static string MainAssetBundleName = "SampleAssetBundle";
+    //public static string MainAssetBundleName = "SampleAssetBundle";
 
     /// <summary>
     /// ³ıÁËÖ÷°üÍâ£¬Êµ¼Ê°üÃû¶¼±ØĞëÈ«²¿Ğ¡Ğ´
     /// </summary>
-    public static string ObjectAssetBundleName = "resourcesbundle";
+    //public static string ObjectAssetBundleName = "resourcesbundle";
 
     public string AssetBundleLoadPath;
 
-    public string HTTPAddress = "http://10.24.4.179:8080/";
+    public string HTTPAddress = "http://192.168.203.59:8080/";
 
     public string HTTPAssetBundlePath;
 
     public string DownloadPath;
     void Start()
     {
-<<<<<<< HEAD
-=======
+        AssetManagerRuntime.AssetManagerInit(LoadPattern);
+        if (LoadPattern == AssetBundlePattern.Remote)
+        {
+            StartCoroutine(GetRemoteVersion());
+        }
+        else
+        {
+            LoadAsset();
+        }
+
+
+        //CheckAssetBundleLoadPath();
+        //LoadAssetBundleButton.onClick.AddListener(CheckAssetBundlePattern);
+        //LoadAssetButton.onClick.AddListener(LoadAsset);
+        //UnloadFalseButton.onClick.AddListener(() => { UnloadAssetBundle(false); });
+        //UnloadTrueButton.onClick.AddListener(() => { UnloadAssetBundle(true); });
+    }
+    void LoadAsset()
+    {
+        AssetPackage assetPackage = AssetManagerRuntime.Instance.LoadPackage("AA");
+
+        Debug.Log(assetPackage.PackageName);
+
+        GameObject sampleObject = assetPackage.LoadAsset<GameObject>("Assets/Resources/Capsule.prefab");
+        Instantiate(sampleObject);
+    }
+    IEnumerator GetRemoteVersion()
+    {
+        string remoteVersionFilePath = Path.Combine(HTTPAddress, "BuildOutput", "BuildVersion.version");
+
+        UnityWebRequest request = UnityWebRequest.Get(remoteVersionFilePath);
+
+        request.SendWebRequest();
+
+        while(!request.isDone)
+        {
+            //·µ»Ønull´ú±íµÈ´ıÒ»Ö¡
+            yield return null;
+        }
+
+        if(!string.IsNullOrEmpty(request.error))
+        {
+            Debug.LogError(request.error);
+            yield break;
+        }
+
+        int version = int.Parse(request.downloadHandler.text);
+
+        AssetManagerRuntime.Instance.RemoteAssetVersion = version;
         
->>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
-        CheckAssetBundleLoadPath();
-        LoadAssetBundleButton.onClick.AddListener(CheckAssetBundlePattern);
-        LoadAssetButton.onClick.AddListener(LoadAsset);
-        UnloadFalseButton.onClick.AddListener(() => { UnloadAssetBundle(false); });
-        UnloadTrueButton.onClick.AddListener(() => { UnloadAssetBundle(true); });
+        Debug.Log($"Ô¶¶Ë×ÊÔ´°æ±¾Îª{version}");
+
+        string downloadPath = Path.Combine(AssetManagerRuntime.Instance.DownloadPath,
+            AssetManagerRuntime.Instance.RemoteAssetVersion.ToString());
+
+        if (!Directory.Exists(downloadPath))
+        {
+            Directory.CreateDirectory(downloadPath);
+        }
+
+        if(AssetManagerRuntime.Instance.LocalAssetVersion != AssetManagerRuntime.Instance.RemoteAssetVersion)
+        {
+            StartCoroutine(GetRemotePackages());
+        }
+        else
+        {
+            LoadAsset();
+        }
+        
+        yield return null;
+    }
+
+    IEnumerator GetRemotePackages()
+    {
+        string remotePackagePath = Path.Combine(HTTPAddress, "BuildOutput", AssetManagerRuntime.Instance.RemoteAssetVersion.ToString(), "AllPackages");
+
+        UnityWebRequest request = UnityWebRequest.Get(remotePackagePath);
+
+        request.SendWebRequest();
+
+        while (!request.isDone)
+        {
+            //·µ»Ønull´ú±íµÈ´ıÒ»Ö¡
+            yield return null;
+        }
+
+        if (!string.IsNullOrEmpty(request.error))
+        {
+            Debug.LogError(request.error);
+            yield break;
+        }
+
+        string allPackagesString = request.downloadHandler.text;
+        
+        string packagesSavePath = Path.Combine(AssetManagerRuntime.Instance.DownloadPath,
+            AssetManagerRuntime.Instance.RemoteAssetVersion.ToString(), "AllPackages");
+
+        File.WriteAllText(packagesSavePath, allPackagesString);
+
+        Debug.Log($"PackagesÏÂÔØÍê±Ï{packagesSavePath}");
+
+        //-----------°ÑÃ¿Ò»¸öPackageµÄ¾ßÌåÎÄ¼şÏÂÔØÏÂÀ´------------
+
+        //½«Ö®Ç°ÏÂÔØºÃµÄallPackage±í¸ñ×ª³ÉListString£¬²¢ÏÂÔØ¶ÔÓ¦°üµ½±¾µØ
+        List<string> packagesNames = JsonConvert.DeserializeObject<List<string>>(allPackagesString);
+
+        foreach(string packageName in packagesNames)
+        {
+            remotePackagePath = Path.Combine(HTTPAddress, "BuildOutput", AssetManagerRuntime.Instance.RemoteAssetVersion.ToString(), packageName);
+
+            request = UnityWebRequest.Get(remotePackagePath);
+
+            request.SendWebRequest();
+
+            while (!request.isDone)
+            {
+                //·µ»Ønull´ú±íµÈ´ıÒ»Ö¡
+                yield return null;
+            }
+
+            if (!string.IsNullOrEmpty(request.error))
+            {
+                Debug.LogError(request.error);
+                yield break;
+            }
+
+            string packageString = request.downloadHandler.text;
+
+            packagesSavePath = Path.Combine(AssetManagerRuntime.Instance.DownloadPath,
+            AssetManagerRuntime.Instance.RemoteAssetVersion.ToString(), packageName);
+
+            File.WriteAllText(packagesSavePath, packageString);
+
+            Debug.Log($"packageÏÂÔØÍê±Ï{packageName}");
+        }
+
+        StartCoroutine(GetRemoteAssetBundleHash());
+        yield return null;
+    }
+
+    IEnumerator GetRemoteAssetBundleHash()
+    {
+        string remoteHashPath = Path.Combine(HTTPAddress, "BuildOutput", AssetManagerRuntime.Instance.RemoteAssetVersion.ToString(), "AssetBundleHashs");
+
+        UnityWebRequest request = UnityWebRequest.Get(remoteHashPath);
+
+        request.SendWebRequest();
+
+        while (!request.isDone)
+        {
+            //·µ»Ønull´ú±íµÈ´ıÒ»Ö¡
+            yield return null;
+        }
+
+        if (!string.IsNullOrEmpty(request.error))
+        {
+            Debug.LogError(request.error);
+            yield break;
+        }
+
+        string hashString = request.downloadHandler.text;
+        string hashSavePath = Path.Combine(AssetManagerRuntime.Instance.DownloadPath,
+            AssetManagerRuntime.Instance.RemoteAssetVersion.ToString(), "AssetBundleHashs");
+
+        File.WriteAllText(hashSavePath, hashString);
+
+        Debug.Log($"AssetBundleHashÁĞ±íÏÂÔØÍê³É{hashString}");
+
+        CreateDownloadList();
+        yield return null;
+    }
+
+    void CreateDownloadList()
+    {
+        //Ê×ÏÈ·Ö±ğ¶ÁÈ¡±¾µØAssetBundleHashÁĞ±íºÍÔ¶¶ËAssetBundleHashÁĞ±í
+        string localAssetBundleHashPath = Path.Combine(AssetManagerRuntime.Instance.AssetBundleLoadPath, "AssetBundleHashs");
+        string assetBundleHashString = "";
+        string[] localAssetBundleHash = null;
+
+        if(File.Exists(localAssetBundleHashPath))
+        {
+            assetBundleHashString = File.ReadAllText(localAssetBundleHashPath);
+
+            localAssetBundleHash = JsonConvert.DeserializeObject<string[]>(assetBundleHashString);
+        }
+
+        string remoteAssetBundleHashPath = Path.Combine(AssetManagerRuntime.Instance.DownloadPath,
+            AssetManagerRuntime.Instance.RemoteAssetVersion.ToString(), "AssetBundleHashs");
+        string remoteAssetBundleHashString = "";
+        string[] remoteAssetBundleHash = null;
+
+        if (File.Exists(remoteAssetBundleHashPath))
+        {
+            remoteAssetBundleHashString = File.ReadAllText(remoteAssetBundleHashPath);
+            remoteAssetBundleHash = JsonConvert.DeserializeObject<string[]>(remoteAssetBundleHashString);
+        }
+
+        //¶ÁÈ¡Íê³Éºó½øĞĞÅĞ¶Ï£¬Èç¹ûÔ¶¶Ë±í²»´æÔÚÔòÖ±½Ó·µ»Ø£¬ÎŞ·¨¸üĞÂ£¬Èç¹û±¾µØ±í²»´æÔÚ£¬ÔòÏÂÔØÁĞ±íµÈÓÚÔ¶¶Ë±í
+        //Èç¹ûÁ½Õß¶¼´æÔÚ£¬Ôò¶Ô±È°æ±¾²îÒì£¬½«ĞÂÔöAssetBundleÄÚÈİ×÷ÎªÏÂÔØÁĞ±í
+        if(remoteAssetBundleHash==null)
+        {
+            Debug.LogError($"Ô¶¶Ë±í¶ÁÈ¡Ê§°Ü{remoteAssetBundleHashPath}");
+            return;
+        }
+
+        //½«ÒªÏÂÔØµÄAB°üÃû³Æ
+        List<string> assetBundleNames = null;
+
+        if(localAssetBundleHash==null)
+        {
+            Debug.LogWarning("±¾µØ±í¶ÁÈ¡Ê§°Ü");
+            assetBundleNames = remoteAssetBundleHash.ToList();
+            
+        }
+        else
+        {
+            AssetBundleVersionDifference versionDifference = ContrastAssetBundleVersion(localAssetBundleHash, remoteAssetBundleHash);
+            
+            //ĞÂÔöAB°üÁĞ±í¾ÍÊÇ½«ÒªÏÂÔØµÄÎÄ¼şÁĞ±í
+            assetBundleNames = versionDifference.AdditionAssetBundles;
+        }
+
+        if(assetBundleNames != null && assetBundleNames.Count>0)
+        {
+            //Ìí¼ÓÖ÷°ü°üÃû
+            assetBundleNames.Add("LocalAssets");
+
+            StartCoroutine(DownloadAssetBundle(assetBundleNames, () => { 
+                CopyDownloadAssetsToLocalPath();
+                AssetManagerRuntime.Instance.UpdateLocalAssetVersion();
+                LoadAsset();
+            }));
+        }
+    }
+
+    void CopyDownloadAssetsToLocalPath()
+    {
+        string downloadAssetVersionPath = Path.Combine(AssetManagerRuntime.Instance.DownloadPath,
+            AssetManagerRuntime.Instance.RemoteAssetVersion.ToString());
+
+        DirectoryInfo directoryInfo = new DirectoryInfo(downloadAssetVersionPath);
+        string localVersionPath = Path.Combine(AssetManagerRuntime.Instance.LocalAssetPath, AssetManagerRuntime.Instance.RemoteAssetVersion.ToString());
+        directoryInfo.MoveTo(localVersionPath);
+    }
+
+    IEnumerator DownloadAssetBundle(List<string> fileNames,Action callBack=null)
+    {
+        foreach(string fileName in fileNames)
+        {
+            string assetBundleName = fileName;
+            if(fileName.Contains("_"))
+            {
+                //ÏÂ»®ÏßºóÒ»Î»²ÅÊÇAssetBundleName
+                int startIndex = fileName.IndexOf("_") + 1;
+                assetBundleName = fileName.Substring(startIndex);
+            }
+
+            string assetBundleDownloadPath = Path.Combine(HTTPAddress, "BuildOutput",
+                AssetManagerRuntime.Instance.RemoteAssetVersion.ToString(), assetBundleName);
+
+            UnityWebRequest request = UnityWebRequest.Get(assetBundleDownloadPath);
+
+            request.SendWebRequest();
+
+            while (!request.isDone)
+            {
+                //·µ»Ønull´ú±íµÈ´ıÒ»Ö¡
+                yield return null;
+            }
+
+            if (!string.IsNullOrEmpty(request.error))
+            {
+                Debug.LogError(request.error);
+                yield break;
+            }
+
+            string assetBundleSavePath = Path.Combine(AssetManagerRuntime.Instance.DownloadPath,
+            AssetManagerRuntime.Instance.RemoteAssetVersion.ToString(), assetBundleName);
+
+            File.WriteAllBytes(assetBundleSavePath, request.downloadHandler.data);
+
+            Debug.Log($"AssetBundleÏÂÔØÍê±Ï{assetBundleName}");
+        }
+
+        callBack?.Invoke();
+        //if(callBack != null)
+        //{
+        //    callBack.Invoke();
+        //}
+
+        yield return null;
+    }
+
+    static AssetBundleVersionDifference ContrastAssetBundleVersion(string[] oldVersionAssets, string[] newVersionAssets)
+    {
+        AssetBundleVersionDifference difference = new AssetBundleVersionDifference();
+        foreach (var assetName in oldVersionAssets)
+        {
+            if (!newVersionAssets.Contains(assetName))
+            {
+                difference.ReducedAssetBundles.Add(assetName);
+            }
+        }
+
+        foreach (var assetName in newVersionAssets)
+        {
+            if (!oldVersionAssets.Contains(assetName))
+            {
+                difference.AdditionAssetBundles.Add(assetName);
+            }
+        }
+
+        return difference;
     }
 
     void CheckAssetBundleLoadPath()
@@ -91,12 +374,12 @@ public class HelloWorld : MonoBehaviour
             case AssetBundlePattern.EditorSimulation:
                 break;
             case AssetBundlePattern.Local:
-                AssetBundleLoadPath = Path.Combine(Application.streamingAssetsPath, MainAssetBundleName);
+                AssetBundleLoadPath = Path.Combine(Application.streamingAssetsPath);
                 break;
             case AssetBundlePattern.Remote:
-                HTTPAssetBundlePath = Path.Combine(HTTPAddress, MainAssetBundleName);
+                HTTPAssetBundlePath = Path.Combine(HTTPAddress);
                 DownloadPath = Path.Combine(Application.persistentDataPath, "DownloadAssetBundle");
-                AssetBundleLoadPath = Path.Combine(DownloadPath, MainAssetBundleName);
+                AssetBundleLoadPath = Path.Combine(DownloadPath);
                 if (!Directory.Exists(AssetBundleLoadPath))
                 {
                     Directory.CreateDirectory(AssetBundleLoadPath);
@@ -153,100 +436,4 @@ public class HelloWorld : MonoBehaviour
         Debug.Log($"{savePath}ÎÄ¼ş±£´æÍê³É");
     }
 
-    void CheckAssetBundlePattern()
-    {
-<<<<<<< HEAD
-=======
-        
->>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
-        if (LoadPattern == AssetBundlePattern.Remote)
-        {
-            StartCoroutine(DownloadFile(ObjectAssetBundleName, LoadAssetBundle));
-        }
-<<<<<<< HEAD
-=======
-        else
-        {
-            LoadAssetBundle();
-        }
->>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
-    }
-    void LoadAssetBundle()
-    {
-        //Í¨¹ıÍâ²¿Â·¾¶¼ÓÔØAB°üµÄ·½Ê½
-        //ÒòÎªpersistentDataPathÔÚÒÆ¶¯¶Ë¿É¶Á¿ÉĞ´µÄÌØĞÔ
-        //Ô¶³ÌÏÂÔØµÄAB°ü¶¼¿ÉÒÔ·ÅÖÃÔÚ¸ÃÂ·¾¶ÏÂ
-        //AB°ü¼ÓÔØ¿ÉÒÔÔÊĞí¼ÓÔØ¹¤³ÌÂ·¾¶ÍâµÄÂ·¾¶£¬¼ÓÔØ·½Ê½ÓÉUnityÎ¬»¤
-
-        string assetBundlePath = Path.Combine(AssetBundleLoadPath,MainAssetBundleName);
-        //¼ÓÔØÇåµ¥À¦°ó°ü
-        AssetBundle mainAB = AssetBundle.LoadFromFile(assetBundlePath);
-
-        //manifestÎÄ¼şÊµ¼ÊÉÏÊÇÃ÷ÎÄ´¢´æ¸øÎÒÃÇ¿ª·¢Õß²éÕÒË÷ÒıµÄ
-        AssetBundleManifest assetBundleManifest = mainAB.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
-
-        //manifest.GetAllDependencies»ñÈ¡µÄÊÇÒ»¸öAB°üËùÓĞÖ±½Ó»ò¼ä½ÓµÄÒıÓÃ
-        //Îª±ÜÃâÄ³Ğ©¼ä½ÓÒıÓÃµÄ×ÊÔ´Ã»ÓĞ±»¼ÓÔØµ½£¬½¨ÒéÊ¹ÓÃGetAllDependencies
-        //manifest.GetDirectDependencies»ñÈ¡µÄÊÇÖ±½ÓµÄÒıÓÃ
-<<<<<<< HEAD
-        foreach (string depAssetBundleName in assetBundleManifest.GetAllDependencies(ObjectAssetBundleName))
-=======
-        foreach (string depAssetBundleName in assetBundleManifest.GetAllDependencies("1"))
->>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
-        {
-            Debug.Log(depAssetBundleName);
-            assetBundlePath = Path.Combine(AssetBundleLoadPath, depAssetBundleName);
-            //Èç¹û²»ĞèÒªÊ¹ÓÃÒÀÀµ°üÊµÀı£¬¿ÉÒÔ²»ÓÃ±äÁ¿´¢´æ¸ÃÊµÀı£¬µ«ÊÇ¸ÃÊµÀıÈÔÈ»»á´æÔÚÓÚÄÚ´æÖĞ
-            AssetBundle.LoadFromFile(assetBundlePath);
-        }
-
-<<<<<<< HEAD
-        assetBundlePath = Path.Combine(AssetBundleLoadPath, ObjectAssetBundleName);
-
-        SampleBundle = AssetBundle.LoadFromFile(assetBundlePath);
-=======
-        assetBundlePath = Path.Combine(AssetBundleLoadPath, "1");
-
-        CubeBundle = AssetBundle.LoadFromFile(assetBundlePath);
-
-        assetBundlePath = Path.Combine(AssetBundleLoadPath, "2");
-
-        SphereBundle = AssetBundle.LoadFromFile(assetBundlePath);
->>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
-    }
-
-    void LoadAsset()
-    {
-<<<<<<< HEAD
-        GameObject cubeObject = SampleBundle.LoadAsset<GameObject>("Cube");
-        SampleObject = Instantiate(cubeObject);
-=======
-        GameObject cubeObject = CubeBundle.LoadAsset<GameObject>("Cube");
-        Instantiate(cubeObject);
-        cubeObject = SphereBundle.LoadAsset<GameObject>("Sphere");
-        Instantiate(cubeObject);
->>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
-    }
-
-    void UnloadAssetBundle(bool isTrue)
-    {
-        Debug.Log(isTrue);
-        //µ±Ç°Ö¡Ïú»Ù¶ÔÏó
-        DestroyImmediate(SampleObject);
-<<<<<<< HEAD
-        SampleBundle.Unload(isTrue);
-=======
-        //CubeBundle.Unload(isTrue);
-        //SphereBundle.Unload(isTrue);
->>>>>>> d91a4b8 (ScriptableObjectçš„ä½¿ç”¨)
-
-        //Ê¹ÓÃunload(false)·½·¨ÓĞÒ»¸öºÜÏÔÖøµÄÓÅÊÆ£¬¾ÍÊÇ²»»áÆÆ»µµ±Ç°ÔËĞĞÊ±µÄĞ§¹û
-        //Èç¹ûÓĞÊ²Ã´×ÊÔ´ÊÇAB°ü´´½¨£¬µ«ÊÇÃ»ÓĞ±»¹ÜÀí£¬µ¼ÖÂ×ÊÔ´ÈÔÈ»±»Ê¹ÓÃ¶øAB°üÊ¹ÓÃunload(true)·½·¨Ğ¶ÔØ
-        //¾Í»áµ¼ÖÂµ±Ç°ÔËĞĞÊ±Í»È»¶ªÊ§Ä³Ğ©À´×ÔĞ¶ÔØAB°üµÄ×ÊÔ´
-        //ÄÇÃ´ºÜÏÔÈ»µÄ£¬ÔÚ²»ÆÆ»µÔËĞĞÊ±µÄĞ§¹ûµÄÇé¿öÏÂ£¨Ò²¾ÍÊÇµ÷ÓÃunload(false)µÄÇé¿öÏÂ£©£¬Ê¹ÓÃResources.unloadUnusedAsset()·½·¨À´»ØÊÕ
-        //ÊÇĞ§¹û×îºÃµÄ
-        //ÒòÎªËùÓĞ¶ÔÄÚ´æµÄ²Ù×÷£¬¶¼»áÕ¼¾İCPUµÄÊ¹ÓÃ£¬ËùÒÔ×îºÃÔÚCPUÊ¹ÓÃÇé¿ö½ÏµÍµÄÇé¿öÏÂ½øĞĞÇ¿ÖÆµÄ×ÊÔ´Ğ¶ÔØ
-        //ÀıÈçÓÎÏ·¹ı³¡¶¯»­£¬»ò³¡¾°¼ÓÔØÊ±
-        Resources.UnloadUnusedAssets();
-    }
-}
+ }

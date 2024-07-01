@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -35,83 +36,13 @@ public class AssetManagerConfigScriptableObject : ScriptableObject
     public int CurrentBuildVersion = 100;
 
 
-    /// <summary>
-    /// 需要打包的文件夹
-    /// </summary>
-    [SerializeField]
-    public DefaultAsset AssetBundleDirectory;
+    public List<PackageEditorInfo> packageEditorInfos = new List<PackageEditorInfo>();
 
-
-    /// <summary>
-    /// 当文件夹变量赋值时，用于储存该文件夹下所有资源路径
-    /// </summary>
-    public List<string> CurrentAllAssets = new List<string>();
-
-    /// <summary>
-    /// 在Editor界面中选择的资源，以数组的索引对应
-    /// </summary>
-    public bool[] CurrentSelectedAssets;
-
-    public void GetCurrentDirectoryAllAssets()
-    {
-        if (AssetBundleDirectory != null)
-        {
-            return;
-        }
-        string directoryPath = AssetDatabase.GetAssetPath(AssetBundleDirectory);
-        CurrentAllAssets = FindAllAssetFromDirectory(directoryPath);
-        CurrentSelectedAssets = new bool[CurrentAllAssets.Count];
-
-    }
-
-    public List<string> FindAllAssetFromDirectory(string directoryPath)
-    {
-        List<string> assetPaths = new List<string>();
-        //如果传入的路径为空或者不存在的话
-        if (string.IsNullOrEmpty(directoryPath) || !Directory.Exists(directoryPath))
-        {
-            Debug.Log("文件夹路径不存在");
-            return null;
-        }
-        //System.IO命名空间下的类，也就是Windows自带的对文件夹进行操作的类
-        //System.IO下的类，只能在PC平台或者Windows上读写文件，在移动端不适用
-        DirectoryInfo directoryInfo = new DirectoryInfo(directoryPath);
-
-        //获取该目录下所有文件信息
-        //Directory文件夹不属于File类型，所以这里不会获取子文件夹
-        FileInfo[] fileInfos = directoryInfo.GetFiles();
-
-        //所有非元数据文件(后缀不是meta的文件)路径都添加到列表中用于打包这些文件
-        foreach (FileInfo info in fileInfos)
-        {
-            //.meta文件代表描述文件
-            if (!isValidExtensionName(info.Extension))
-            {
-                continue;
-            }
-            //AssetBundle打包只需要文件名
-            string assetPath = Path.Combine(directoryPath, info.Name);
-            assetPaths.Add(assetPath);
-        }
-        return assetPaths;
-    }
 
     /// <summary>
     /// 需要排除的Asset拓展名
     /// </summary>
     public string[] InvalidExtensionNames = new string[] { ".meta", ".cs" };
 
-    public bool isValidExtensionName(string fileName)
-    {
-        bool isValid = true;
-        foreach (string invalidName in InvalidExtensionNames)
-        {
-            if (fileName.Contains(invalidName))
-            {
-                isValid = false;
-                return isValid;
-            }
-        }
-        return isValid;
-    }
+    
 }

@@ -12,14 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef5737ec35b312d4080619d2e2287262, type: 3}
   m_Name: AssetManagerConfig
   m_EditorClassIdentifier: 
-  BuildingPattern: 0
-  _IncrementalBuildMode: 0
-  CompressionPattern: 0
+  BuildingPattern: 1
+  _IncrementalBuildMode: 2
+  CompressionPattern: 1
   AssetManagerVersion: 100
   CurrentBuildVersion: 100
-  AssetBundleDirectory: {fileID: 0}
-  CurrentAllAssets: []
-  CurrentSelectedAssets: 
+  packageEditorInfos:
+  - PackageName: A
+    AssetList:
+    - {fileID: 6888692523717199140, guid: 2dfb32014330b02409653510b1117598, type: 3}
+  - PackageName: B
+    AssetList:
+    - {fileID: 5661009918641322817, guid: bca3d3dc7e952074b83ea2ae1c5ed8c4, type: 3}
+    - {fileID: 4289147072633330652, guid: 081053edf6c7f2c42aa3c64d9f15b862, type: 3}
   InvalidExtensionNames:
   - .meta
   - .cs
